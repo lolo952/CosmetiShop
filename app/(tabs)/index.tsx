@@ -1,66 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useRouter } from 'expo-router';
+import { Href, Stack, useRouter } from 'expo-router';
 import React from 'react';
 import { ImageBackground, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../components/shared/Button';
 import Footer from '../../components/shared/Footer';
 import Input from '../../components/shared/Input';
-import ProductCard from '../../components/shared/ProductCard';
 import Section from '../../components/shared/Section';
 import { Colors } from '../../constants/theme';
 
-// Mock Data
-const BEST_SELLERS = [
-    {
-        id: '1',
-        title: 'Sérum Vitamine C Éclat Radieux',
-        brand: 'Luminé',
-        price: 49.99,
-        originalPrice: 69.99,
-        rating: 4.8,
-        reviews: 234,
-        image: { uri: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: '-29%', variant: 'sale' as const },
-    },
-    {
-        id: '2',
-        title: 'Crème Hydratante Intensive 24h',
-        brand: 'Aqua Pure',
-        price: 38.00,
-        rating: 4.9,
-        reviews: 512,
-        image: { uri: 'https://images.unsplash.com/photo-1608248597279-f99d160bfbc8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: 'Nouveau', variant: 'new' as const },
-    },
-    {
-        id: '3',
-        title: 'Huile Précieuse Rose Musquée',
-        brand: 'Botanica',
-        price: 32.50,
-        rating: 4.7,
-        reviews: 189,
-        image: { uri: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-    },
-    {
-        id: '4',
-        title: 'Masque Peel-Off Charbon Détox',
-        brand: 'Clear Skin',
-        price: 24.99,
-        originalPrice: 29.99,
-        rating: 4.5,
-        reviews: 98,
-        image: { uri: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: '-17%', variant: 'sale' as const },
-    },
-];
+
 
 const CATEGORIES = [
-    { id: '1', title: 'Soins Visage', image: 'https://images.unsplash.com/photo-1570172619643-c39712a7732a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
+    { id: '1', title: 'Soins', image: 'https://images.unsplash.com/photo-1570172619643-c39712a7732a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
     { id: '2', title: 'Maquillage', image: 'https://images.unsplash.com/photo-1522335789203-abd1aaccd158?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-    { id: '3', title: 'Soins Corps', image: 'https://images.unsplash.com/photo-1556228720-1957be982260?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
+    { id: '3', title: 'Corps', image: 'https://images.unsplash.com/photo-1556228720-1957be982260?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
     { id: '4', title: 'Parfums', image: 'https://images.unsplash.com/photo-1594035910387-fea4779426aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
+    { id: '5', title: 'Cheveux', image: 'https://images.unsplash.com/photo-1560869713-7d0a29430803?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
 ];
 
 const BENEFITS = [
@@ -169,7 +126,7 @@ export default function Home() {
                                 <Button
                                     title="Voir tout"
                                     variant="outline"
-                                    onPress={() => router.push('/products')}
+                                    onPress={() => router.push('/products' as Href)}
                                     style={{
                                         marginTop: isMobile ? 16 : 0,
                                         borderColor: Colors.light.primary,
@@ -181,16 +138,7 @@ export default function Home() {
                                 />
                             </View>
 
-                            <View style={[styles.productsGrid, isMobile && styles.productsGridMobile]}>
-                                {BEST_SELLERS.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                        onPress={() => { }}
-                                        style={isMobile ? { width: '100%' } : { width: '23%' }}
-                                    />
-                                ))}
-                            </View>
+
                         </Section>
 
                         {/* Categories */}
@@ -207,8 +155,8 @@ export default function Home() {
                                 {CATEGORIES.map((cat) => (
                                     <TouchableOpacity
                                         key={cat.id}
-                                        style={[styles.categoryCard, isMobile ? { width: '100%' } : { width: '48%' }]}
-                                        onPress={() => router.push('/categories')}
+                                        style={[styles.categoryCard, isMobile ? { width: '100%' } : { width: '31%' }]}
+                                        onPress={() => router.push({ pathname: '/search', params: { category: cat.title } } as Href)}
                                     >
                                         <ImageBackground source={{ uri: cat.image }} style={styles.categoryImage}>
                                             <View style={styles.categoryOverlay}>
