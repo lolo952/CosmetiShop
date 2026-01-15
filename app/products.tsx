@@ -8,52 +8,11 @@ import ProductCard from '../components/shared/ProductCard';
 import Section from '../components/shared/Section';
 import { Colors } from '../constants/theme';
 
-// Reuse mock data for now
-const PRODUCTS = [
-    {
-        id: '1',
-        title: 'Sérum Vitamine C Éclat Radieux',
-        brand: 'Luminé',
-        price: 499.00,
-        originalPrice: 699.00,
-        rating: 4.8,
-        reviews: 234,
-        image: { uri: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: '-29%', variant: 'sale' as const },
-    },
-    {
-        id: '2',
-        title: 'Crème Hydratante Intensive 24h',
-        brand: 'Aqua Pure',
-        price: 380.00,
-        rating: 4.9,
-        reviews: 512,
-        image: { uri: 'https://images.unsplash.com/photo-1608248597279-f99d160bfbc8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: 'Nouveau', variant: 'new' as const },
-    },
-    {
-        id: '3',
-        title: 'Huile Précieuse Rose Musquée',
-        brand: 'Botanica',
-        price: 325.00,
-        rating: 4.7,
-        reviews: 189,
-        image: { uri: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-    },
-    {
-        id: '4',
-        title: 'Masque Peel-Off Charbon Détox',
-        brand: 'Clear Skin',
-        price: 249.00,
-        originalPrice: 299.00,
-        rating: 4.5,
-        reviews: 98,
-        image: { uri: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: '-17%', variant: 'sale' as const },
-    },
-];
+import { Href, useRouter } from 'expo-router';
+import { PRODUCTS } from '../constants/products';
 
 export default function ProductsPage() {
+    const router = useRouter();
     const { width } = useWindowDimensions();
     const isMobile = width < 768;
 
@@ -79,15 +38,7 @@ export default function ProductsPage() {
                                     <ProductCard
                                         key={product.id}
                                         product={product}
-                                        onPress={() => { }}
-                                        style={isMobile ? { width: '100%' } : { width: '23%' }}
-                                    />
-                                ))}
-                                {PRODUCTS.map((product) => (
-                                    <ProductCard
-                                        key={`dup-${product.id}`}
-                                        product={{ ...product, id: `dup-${product.id}` }}
-                                        onPress={() => { }}
+                                        onPress={() => router.push(`/product/${product.id}` as Href)}
                                         style={isMobile ? { width: '100%' } : { width: '23%' }}
                                     />
                                 ))}

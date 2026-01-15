@@ -1,38 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Footer from '../components/shared/Footer';
 import ProductCard from '../components/shared/ProductCard';
 import Section from '../components/shared/Section';
+import { PRODUCTS } from '../constants/products';
 import { Colors } from '../constants/theme';
 
-const NEW_ARRIVALS = [
-    {
-        id: 'n1',
-        title: 'Brume Parfumée Fleur d\'Oranger',
-        brand: 'Oasis',
-        price: 245.00,
-        rating: 4.9,
-        reviews: 42,
-        image: { uri: 'https://images.unsplash.com/photo-1594035910387-fea4779426aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: 'Nouveau', variant: 'new' as const },
-    },
-    {
-        id: 'n2',
-        title: 'Palette Regard Intense',
-        brand: 'Glamour',
-        price: 420.00,
-        rating: 4.7,
-        reviews: 86,
-        image: { uri: 'https://images.unsplash.com/photo-1522335789203-abd1aaccd158?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: 'Nouveau', variant: 'new' as const },
-    },
-];
+const NEW_ARRIVALS = PRODUCTS.filter(p => p.id.startsWith('n'));
 
 export default function NewArrivalsPage() {
+    const router = useRouter();
     const { width } = useWindowDimensions();
     const isMobile = width < 768;
 
@@ -62,7 +43,7 @@ export default function NewArrivalsPage() {
                                     <ProductCard
                                         key={product.id}
                                         product={product}
-                                        onPress={() => { }}
+                                        onPress={() => router.push(`/product/${product.id}` as any)}
                                         style={isMobile ? { width: '100%' } : { width: '23%' }}
                                     />
                                 ))}

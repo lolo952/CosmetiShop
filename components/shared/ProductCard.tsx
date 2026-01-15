@@ -2,30 +2,22 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Colors } from '../../constants/theme';
+import { useCart } from '../../context/CartContext';
+import { useFavorites } from '../../hooks/useFavorites';
+import { Product } from '../../types/product';
 import Badge from './Badge';
 
-export interface ProductProps {
-    id: string;
-    image: any;
-    title: string;
-    brand: string;
-    price: number;
-    originalPrice?: number;
-    rating: number;
-    reviews: number;
-    badge?: {
-        label: string;
-        variant: 'sale' | 'new';
-    };
-}
-
 interface ProductCardProps {
-    product: ProductProps;
+    product: Product;
     onPress: () => void;
     style?: ViewStyle;
 }
 
 export default function ProductCard({ product, onPress, style }: ProductCardProps) {
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const { addToCart } = useCart();
+    const favorited = isFavorite(product.id);
+
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -42,10 +34,36 @@ export default function ProductCard({ product, onPress, style }: ProductCardProp
                     </View>
                 )}
 
-                {/* Favorite Button */}
-                <TouchableOpacity style={styles.favoriteBtn}>
-                    <Ionicons name="heart-outline" size={20} color={Colors.light.text} />
-                </TouchableOpacity>
+                {/* Favorite & Cart Buttons */}
+                <View style={styles.actionsContainer}>
+                    <TouchableOpacity
+                        style={styles.actionBtn}
+                        onPress={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(product.id);
+                        }}
+                    >
+                        <Ionicons
+                            name={favorited ? "heart" : "heart-outline"}
+                            size={18}
+                            color={favorited ? Colors.light.primary : Colors.light.text}
+                        />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.actionBtn}
+                        onPress={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                        }}
+                    >
+                        <Ionicons
+                            name="cart-outline"
+                            size={18}
+                            color={Colors.light.text}
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.details}>
@@ -105,10 +123,13 @@ const styles = StyleSheet.create({
         top: 12,
         left: 12,
     },
-    favoriteBtn: {
+    actionsContainer: {
         position: 'absolute',
         top: 12,
         right: 12,
+        gap: 8,
+    },
+    actionBtn: {
         backgroundColor: '#FFF',
         borderRadius: 20,
         padding: 8,

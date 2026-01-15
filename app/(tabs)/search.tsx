@@ -14,40 +14,33 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ProductCard from '../../components/shared/ProductCard';
 import { Colors } from '../../constants/theme';
 
-const CATEGORIES = ['Tous', 'Soins', 'Maquillage', 'Parfums', 'Corps'];
-const PRICE_RANGES = ['Tous les prix', '0-20 Dhs', '20-40 Dhs', '40-60 Dhs', '60+ Dhs'];
-
-const MOCK_PRODUCTS = [
-    {
-        id: '1',
-        title: 'Sérum Vitamine C Éclat Radieux',
-        brand: 'Luminé',
-        price: 499.00,
-        originalPrice: 699.00,
-        rating: 4.8,
-        reviews: 234,
-        image: { uri: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: '-29%', variant: 'sale' as const },
-    },
-    {
-        id: '2',
-        title: 'Crème Hydratante Intensive 24h',
-        brand: 'Aqua Pure',
-        price: 380.00,
-        rating: 4.9,
-        reviews: 512,
-        image: { uri: 'https://images.unsplash.com/photo-1608248597279-f99d160bfbc8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-        badge: { label: 'Nouveau', variant: 'new' as const },
-    },
-];
+import { Href, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import { CATEGORIES, PRODUCTS } from '../../constants/products';
 
 export default function SearchScreen() {
+    const router = useRouter();
     const { width } = useWindowDimensions();
     const isMobile = width < 768;
+    const { category } = useLocalSearchParams<{ category: string }>();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Tous');
-    const [selectedPrice, setSelectedPrice] = useState('Tous les prix');
     const [showFilters, setShowFilters] = useState(false);
+
+    useEffect(() => {
+        if (category) {
+            setSelectedCategory(category);
+            setShowFilters(true); // Show filters so user sees what is selected
+        }
+    }, [category]);
+
+    const filteredProducts = PRODUCTS.filter(product => {
+        const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory === 'Tous' || product.category === selectedCategory;
+
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -55,8 +48,8 @@ export default function SearchScreen() {
                 <View style={styles.content}>
                     {/* Title and Result Count */}
                     <View style={styles.headerSection}>
-                        <Text style={styles.pageTitle}>Tous nos produits</Text>
-                        <Text style={styles.resultCount}>8 produits trouvés</Text>
+                        <Text style={styles.pageTitle}>Catalogue</Text>
+                        <Text style={styles.resultCount}>{filteredProducts.length} produits trouvés</Text>
                     </View>
 
                     {/* Secondary Search Bar */}
@@ -66,6 +59,8 @@ export default function SearchScreen() {
                             style={styles.secondaryInput}
                             placeholder="Rechercher un produit..."
                             placeholderTextColor={Colors.light.muted}
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
                         />
                     </View>
 
@@ -104,40 +99,16 @@ export default function SearchScreen() {
                                     ))}
                                 </ScrollView>
                             </View>
-
-                            {/* Price Filter */}
-                            <View style={styles.filterSection}>
-                                <Text style={styles.sectionLabel}>Prix</Text>
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsContainer}>
-                                    {PRICE_RANGES.map((range) => (
-                                        <TouchableOpacity
-                                            key={range}
-                                            onPress={() => setSelectedPrice(range)}
-                                            style={[
-                                                styles.pill,
-                                                selectedPrice === range && styles.activePill
-                                            ]}
-                                        >
-                                            <Text style={[
-                                                styles.pillText,
-                                                selectedPrice === range && styles.activePillText
-                                            ]}>
-                                                {range}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                            </View>
                         </>
                     )}
 
                     {/* Results Grid */}
                     <View style={styles.grid}>
-                        {[...MOCK_PRODUCTS, ...MOCK_PRODUCTS, ...MOCK_PRODUCTS, ...MOCK_PRODUCTS].map((product, index) => (
+                        {filteredProducts.map((product) => (
                             <ProductCard
-                                key={`${product.id}-${index}`}
+                                key={product.id}
                                 product={product}
-                                onPress={() => { }}
+                                onPress={() => router.push(`/product/${product.id}` as Href)}
                                 style={isMobile ? { width: '100%', marginBottom: 16 } : { width: '48%', marginBottom: 20 }}
                             />
                         ))}

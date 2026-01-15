@@ -4,6 +4,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { View } from "react-native";
 import Header from "../components/shared/Header";
+import { CartProvider } from "../context/CartContext";
+import { FavoritesProvider } from "../context/FavoritesContext";
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -23,11 +25,15 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Header />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </View>
+    <FavoritesProvider>
+      <CartProvider>
+        <View style={{ flex: 1 }}>
+          <Header />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </View>
+      </CartProvider>
+    </FavoritesProvider>
   );
 }
