@@ -49,10 +49,10 @@ export default function SuccessScreen() {
                         style={styles.mainBtn}
                     />
                     <Button
-                    title="Voir mes commandes"
-                    onPress={() => router.push('/orders' as any)}
-                    variant="outline"
-                    style={styles.outlineBtn}
+                        title="Voir mes commandes"
+                        onPress={() => router.push('/(tabs)/profile' as any)}
+                        variant="outline"
+                        style={styles.outlineBtn}
                     />
                 </View>
             </View>

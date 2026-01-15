@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Colors } from '../../constants/theme';
 
-type BadgeVariant = 'sale' | 'new' | 'default';
+type BadgeVariant = 'sale' | 'new' | 'hot' | 'default';
 
 interface BadgeProps {
     label: string;
@@ -16,7 +16,9 @@ export default function Badge({ label, variant = 'default', style }: BadgeProps)
             ? Colors.light.error // Red for sale
             : variant === 'new'
                 ? Colors.light.accent // Pink for new
-                : Colors.light.muted; // Gray for default
+                : variant === 'hot'
+                    ? '#FFA500' // Orange for hot
+                    : Colors.light.muted; // Gray for default
 
     return (
         <View style={[styles.container, { backgroundColor }, style]}>

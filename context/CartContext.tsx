@@ -1,9 +1,9 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import React, { createContext, useContext, useState } from 'react';
-import { ProductProps } from '../components/shared/ProductCard';
-import { db } from '../firebase'; 
+import { db } from '../firebase';
+import { Product } from '../types/product';
 
-export interface CartItem extends ProductProps {
+export interface CartItem extends Product {
     quantity: number;
 }
 
@@ -34,7 +34,7 @@ interface CartContextType {
     deliveryInfo: DeliveryInfo | null;
     setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
     setDeliveryInfo: React.Dispatch<React.SetStateAction<DeliveryInfo | null>>;
-    addToCart: (product: ProductProps) => void;
+    addToCart: (product: Product) => void;
     removeFromCart: (productId: string) => void;
     updateQuantity: (productId: string, quantity: number) => void;
     checkout: (details: { deliveryInfo: DeliveryInfo | null, paymentMethod: string, userId: string }) => Promise<void>;
@@ -50,7 +50,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [orders, setOrders] = useState<Order[]>([]);
     const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
 
-    const addToCart = (product: ProductProps) => {
+    const addToCart = (product: Product) => {
         setItems(prev => {
             const existingItem = prev.find(item => item.id === product.id);
             if (existingItem) {
