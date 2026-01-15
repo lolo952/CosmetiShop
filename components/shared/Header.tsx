@@ -4,6 +4,9 @@ import React from 'react';
 import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/theme';
+import { useCart } from '../../context/CartContext';
+import Badge from './Badge';
+
 
 export default function Header() {
     const insets = useSafeAreaInsets();
@@ -12,6 +15,8 @@ export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isSearchVisible, setIsSearchVisible] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState('');
+    const { itemCount } = useCart();
+
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -91,7 +96,13 @@ export default function Header() {
 
                     <TouchableOpacity style={styles.iconBtn} onPress={() => handleNavigation('/cart')}>
                         <Ionicons name="cart-outline" size={20} color={Colors.light.text} />
+                        {itemCount > 0 && (
+                            <View style={styles.badgeContainer}>
+                                <Badge label={itemCount.toString()} variant="new" />
+                            </View>
+                        )}
                     </TouchableOpacity>
+
 
                     <TouchableOpacity style={styles.iconBtn} onPress={() => handleNavigation('/profile')}>
                         <Ionicons name="person-outline" size={20} color={Colors.light.text} />
@@ -249,4 +260,11 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#1A1A1A',
     },
+    badgeContainer: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+        transform: [{ scale: 0.7 }],
+    },
 });
+

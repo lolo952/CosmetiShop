@@ -9,7 +9,9 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import OrderHistory from '../../components/cart/OrderHistory';
 import { Colors } from '../../constants/theme';
+import { useCart } from '../../context/CartContext';
 
 const MENU_ITEMS = [
     { id: '1', icon: 'person-outline', label: 'Informations personnelles', sub: 'Nom, email, numéro...' },
@@ -22,6 +24,8 @@ const MENU_ITEMS = [
 ];
 
 export default function ProfileScreen() {
+    const { orders } = useCart();
+
     return (
         <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -40,7 +44,7 @@ export default function ProfileScreen() {
 
                     <View style={styles.statsContainer}>
                         <View style={styles.statItem}>
-                            <Text style={styles.statValue}>12</Text>
+                            <Text style={styles.statValue}>{orders.length}</Text>
                             <Text style={styles.statLabel}>Commandes</Text>
                         </View>
                         <View style={styles.divider} />
@@ -82,6 +86,14 @@ export default function ProfileScreen() {
                             <Text style={[styles.menuLabel, { color: '#FF4D4D' }]}>Se déconnecter</Text>
                         </View>
                     </TouchableOpacity>
+
+                    {/* Order History Section */}
+                    {orders.length > 0 && (
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={styles.menuTitle}>Mon Historique</Text>
+                            <OrderHistory />
+                        </View>
+                    )}
                 </View>
 
                 <View style={styles.footer}>

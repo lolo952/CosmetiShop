@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native';
 import { Colors } from '../../constants/theme';
 
 interface InputProps {
@@ -8,7 +8,7 @@ interface InputProps {
     placeholder?: string;
     label?: string;
     error?: string;
-    style?: ViewStyle;
+    style?: StyleProp<ViewStyle>;
 }
 
 export default function Input({ value, onChangeText, placeholder, label, error, style }: InputProps) {

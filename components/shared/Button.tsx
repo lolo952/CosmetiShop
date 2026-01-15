@@ -1,14 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import { ActivityIndicator, GestureResponderEvent, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import { Colors } from '../../constants/theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
+type ButtonSize = 'small' | 'medium' | 'large';
 
 interface ButtonProps {
     title: string;
-    onPress: () => void;
+    onPress: (event?: GestureResponderEvent) => void;
     variant?: ButtonVariant;
+    size?: ButtonSize;
     style?: ViewStyle;
     textStyle?: TextStyle;
     iconLeft?: React.ReactNode;
@@ -21,6 +23,7 @@ export default function Button({
     title,
     onPress,
     variant = 'primary',
+    size = 'medium',
     style,
     textStyle,
     iconLeft,
@@ -43,12 +46,12 @@ export default function Button({
             : variant === 'secondary'
                 ? Colors.light.primary
                 : variant === 'outline'
-                    ? Colors.light.primary
+                    ? Colors.light.text
                     : Colors.light.text;
 
     const borderStyle =
         variant === 'outline'
-            ? { borderWidth: 1, borderColor: Colors.light.primary }
+            ? { borderWidth: 1, borderColor: Colors.light.border }
             : {};
 
     const buttonContent = (
@@ -73,7 +76,11 @@ export default function Button({
                     colors={['#D98895', '#E59AA6']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={[styles.button]} // Apply base button styles to gradient
+                    style={[
+                        styles.button,
+                        size === 'small' && styles.smallButton,
+                        size === 'large' && styles.largeButton
+                    ]} // Apply base button styles to gradient
                 >
                     {loading ? (
                         <ActivityIndicator color={textColor} />
@@ -91,6 +98,8 @@ export default function Button({
             disabled={disabled || loading}
             style={[
                 styles.button,
+                size === 'small' && styles.smallButton,
+                size === 'large' && styles.largeButton,
                 { backgroundColor },
                 borderStyle,
                 style,
@@ -131,5 +140,17 @@ const styles = StyleSheet.create({
     },
     disabled: {
         opacity: 0.6,
+    },
+    smallButton: {
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        minHeight: 32,
+        borderRadius: 8,
+    },
+    largeButton: {
+        paddingVertical: 16,
+        paddingHorizontal: 32,
+        minHeight: 56,
+        borderRadius: 16,
     },
 });

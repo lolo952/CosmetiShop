@@ -2,7 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Colors } from '../../constants/theme';
+import { useCart } from '../../context/CartContext';
 import Badge from './Badge';
+import Button from './Button';
 
 export interface ProductProps {
     id: string;
@@ -26,6 +28,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onPress, style }: ProductCardProps) {
+    const { addToCart } = useCart();
+
+    const handleAddToCart = (e?: any) => {
+        e?.stopPropagation?.();
+        addToCart(product);
+    };
+
     return (
         <TouchableOpacity
             onPress={onPress}
@@ -69,6 +78,16 @@ export default function ProductCard({ product, onPress, style }: ProductCardProp
                         </Text>
                     )}
                 </View>
+
+                {/* Add to Cart Button */}
+                <Button
+                    title="Ajouter"
+                    onPress={handleAddToCart}
+                    variant="primary"
+                    size="small"
+                    style={styles.addBtn}
+                    iconLeft={<Ionicons name="cart-outline" size={16} color="#fff" />}
+                />
             </View>
         </TouchableOpacity>
     );
@@ -162,4 +181,11 @@ const styles = StyleSheet.create({
         textDecorationLine: 'line-through',
         color: Colors.light.muted,
     },
+    addBtn: {
+        marginTop: 12,
+        height: 36,
+        borderRadius: 8,
+    },
 });
+
+
