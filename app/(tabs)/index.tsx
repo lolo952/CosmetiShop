@@ -2,16 +2,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Href, Stack, useRouter } from 'expo-router';
 import React from 'react';
-import { ImageBackground, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { ImageBackground, LayoutChangeEvent, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../components/shared/Button';
 import Footer from '../../components/shared/Footer';
 import Input from '../../components/shared/Input';
-import ProductCard from '../../components/shared/ProductCard';
 import Section from '../../components/shared/Section';
 import { Colors } from '../../constants/theme';
 
+import ProductCard from '../../components/shared/ProductCard';
 import { PRODUCTS } from '../../constants/products';
+
 
 const CATEGORIES = [
     { id: '1', title: 'Soins', image: require('../../assets/images/soins.jpg') },
@@ -32,6 +34,8 @@ export default function Home() {
     const router = useRouter();
     const { width } = useWindowDimensions();
     const isMobile = width < 768;
+    const scrollViewRef = React.useRef<ScrollView>(null);
+    const bestSellersY = React.useRef(0);
 
     return (
         <>
@@ -43,7 +47,11 @@ export default function Home() {
                     end={{ x: 1, y: 1 }}
                     style={{ flex: 1 }}
                 >
-                    <ScrollView style={{ flex: 1 }}>
+                    <ScrollView
+                        ref={scrollViewRef}
+                        style={{ flex: 1 }}
+                        showsVerticalScrollIndicator={false}
+                    >
 
                         {/* Hero Section */}
                         <Section>
@@ -65,14 +73,19 @@ export default function Home() {
                                 <View style={styles.heroButtons}>
                                     <Button
                                         title="Découvrir la collection"
-                                        onPress={() => { }}
+                                        onPress={() => router.push('/products' as Href)}
                                         iconRight={<Ionicons name="arrow-forward" size={18} color="#fff" />}
                                         style={{ height: 48, borderRadius: 12 }}
                                     />
                                     <Button
                                         title="Nos best-sellers"
                                         variant="outline"
-                                        onPress={() => { }}
+                                        onPress={() => {
+                                            scrollViewRef.current?.scrollTo({
+                                                y: bestSellersY.current,
+                                                animated: true
+                                            });
+                                        }}
                                         style={{ borderRadius: 12, borderColor: Colors.light.primary, paddingHorizontal: 32 }}
                                         textStyle={{ color: Colors.light.primary }}
                                     />
@@ -117,7 +130,12 @@ export default function Home() {
                         </Section>
 
                         {/* Best Sellers */}
-                        <Section>
+                        <Section
+                            onLayout={(event: LayoutChangeEvent) => {
+                                bestSellersY.current = event.nativeEvent.layout.y;
+                            }}
+                        >
+
                             <View style={styles.sectionHeader}>
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.sectionTag}>SÉLECTION DU MOMENT</Text>
@@ -138,6 +156,7 @@ export default function Home() {
                                     iconRight={<Ionicons name="arrow-forward" size={16} color={Colors.light.primary} />}
                                 />
                             </View>
+
 
                             <View style={[styles.productsGrid, isMobile && styles.productsGridMobile]}>
                                 {PRODUCTS.slice(0, 4).map((product) => (

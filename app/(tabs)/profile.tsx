@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
     Platform,
@@ -12,19 +13,34 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import OrderHistory from '../../components/cart/OrderHistory';
 import { Colors } from '../../constants/theme';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/auth-context';
 
 const MENU_ITEMS = [
-    { id: '1', icon: 'person-outline', label: 'Informations personnelles', sub: 'Nom, email, numéro...' },
-    { id: '2', icon: 'cart-outline', label: 'Mes Commandes', sub: 'Historique, suivi...' },
-    { id: '3', icon: 'heart-outline', label: 'Ma Liste de Souhaits', sub: 'Produits enregistrés' },
-    { id: '4', icon: 'location-outline', label: 'Adresses de livraison', sub: 'Gérer vos adresses' },
-    { id: '5', icon: 'card-outline', label: 'Méthodes de paiement', sub: 'Gérer vos cartes' },
-    { id: '6', icon: 'notifications-outline', label: 'Notifications', sub: 'Alertes, promotions...' },
-    { id: '7', icon: 'help-circle-outline', label: 'Aide & Support', sub: 'FAQ, contact...' },
+    { id: '1', icon: 'person-outline', label: 'Informations personnelles', sub: 'Nom, email, numéro...', route: '/personal-info' },
+    { id: '2', icon: 'cart-outline', label: 'Mes Commandes', sub: 'Historique, suivi...', route: '/orders' },
+    { id: '3', icon: 'heart-outline', label: 'Ma Liste de Souhaits', sub: 'Produits enregistrés', route: '/wishlist' },
+    { id: '4', icon: 'location-outline', label: 'Adresses de livraison', sub: 'Gérer vos adresses', route: '/addresses' },
+    { id: '5', icon: 'card-outline', label: 'Méthodes de paiement', sub: 'Gérer vos cartes', route: '/payment-methods' },
+    { id: '6', icon: 'notifications-outline', label: 'Notifications', sub: 'Alertes, promotions...', route: '/notifications-settings' },
+    { id: '7', icon: 'help-circle-outline', label: 'Aide & Support', sub: 'FAQ, contact...', route: '/help-support' },
 ];
 
 export default function ProfileScreen() {
     const { orders } = useCart();
+    const { user, userProfile, signOut, loading } = useAuth();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await signOut();
+    };
+
+    const handleAuthAction = () => {
+        if (user) {
+            handleLogout();
+        } else {
+            router.push('/login' as any);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -39,8 +55,12 @@ export default function ProfileScreen() {
                             <Ionicons name="camera" size={16} color="#fff" />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.userName}>Utilisateur Invité</Text>
-                    <Text style={styles.userEmail}>invité@cosmetishop.ma</Text>
+                    <Text style={styles.userName}>
+                        {userProfile?.fullName || user?.displayName || 'Utilisateur'}
+                    </Text>
+                    <Text style={styles.userEmail}>
+                        {userProfile?.email || user?.email || 'invité@cosmetishop.ma'}
+                    </Text>
 
                     <View style={styles.statsContainer}>
                         <View style={styles.statItem}>
@@ -64,7 +84,17 @@ export default function ProfileScreen() {
                 <View style={styles.menuSection}>
                     <Text style={styles.menuTitle}>Mon Compte</Text>
                     {MENU_ITEMS.map((item) => (
-                        <TouchableOpacity key={item.id} style={styles.menuItem}>
+                        <TouchableOpacity
+                            key={item.id}
+                            style={styles.menuItem}
+                            onPress={() => {
+                                if (user) {
+                                    router.push(item.route as any);
+                                } else {
+                                    router.push('/login' as any);
+                                }
+                            }}
+                        >
                             <View style={styles.menuItemLeft}>
                                 <View style={styles.iconContainer}>
                                     <Ionicons name={item.icon as any} size={22} color={Colors.light.primary} />
@@ -78,12 +108,21 @@ export default function ProfileScreen() {
                         </TouchableOpacity>
                     ))}
 
-                    <TouchableOpacity style={[styles.menuItem, styles.logoutBtn]}>
+                    <TouchableOpacity
+                        style={[styles.menuItem, styles.logoutBtn]}
+                        onPress={handleAuthAction}
+                    >
                         <View style={styles.menuItemLeft}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#FFEEF0' }]}>
-                                <Ionicons name="log-out-outline" size={22} color="#FF4D4D" />
+                            <View style={[styles.iconContainer, { backgroundColor: user ? '#FFEEF0' : '#E8F5E9' }]}>
+                                <Ionicons
+                                    name={user ? "log-out-outline" : "log-in-outline"}
+                                    size={22}
+                                    color={user ? "#FF4D4D" : "#4CAF50"}
+                                />
                             </View>
-                            <Text style={[styles.menuLabel, { color: '#FF4D4D' }]}>Se déconnecter</Text>
+                            <Text style={[styles.menuLabel, { color: user ? '#FF4D4D' : '#4CAF50' }]}>
+                                {user ? 'Se déconnecter' : 'Se connecter'}
+                            </Text>
                         </View>
                     </TouchableOpacity>
 

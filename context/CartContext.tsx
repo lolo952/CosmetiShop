@@ -1,7 +1,8 @@
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import React, { createContext, useContext, useState } from 'react';
+import { addDoc, collection, getDocs, orderBy, query, serverTimestamp, where } from 'firebase/firestore';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { Product } from '../types/product';
+import { useAuth } from './auth-context';
 
 export interface CartItem extends Product {
     quantity: number;
@@ -41,7 +42,9 @@ interface CartContextType {
     clearCart: () => void;
     totalAmount: number;
     itemCount: number;
+    ordersLoading: boolean;
 }
+
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -49,6 +52,40 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [items, setItems] = useState<CartItem[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
+    const [ordersLoading, setOrdersLoading] = useState(false);
+    const { user } = useAuth();
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            if (!user) {
+                setOrders([]);
+                return;
+            }
+            setOrdersLoading(true);
+            try {
+                const ordersRef = collection(db, 'orders');
+                const q = query(
+                    ordersRef,
+                    where('userId', '==', user.uid),
+                    orderBy('createdAt', 'desc')
+                );
+                const snapshot = await getDocs(q);
+                const fetchedOrders = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Order[];
+                setOrders(fetchedOrders);
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            } finally {
+                setOrdersLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, [user]);
+
+
 
     const addToCart = (product: Product) => {
         setItems(prev => {
@@ -130,8 +167,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             checkout,
             clearCart,
             totalAmount,
-            itemCount
+            itemCount,
+            ordersLoading
         }}>
+
             {children}
         </CartContext.Provider>
     );

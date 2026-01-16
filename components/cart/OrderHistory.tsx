@@ -1,41 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../../constants/theme';
+import { useAuth } from '../../context/auth-context';
 import { Order, useCart } from '../../context/CartContext';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '../../firebase';
-
-// Fonction pour récupérer les commandes depuis Firestore
-const fetchOrdersFromFirestore = async (): Promise<Order[]> => {
-  try {
-    const ordersRef = collection(db, 'orders');
-    const q = query(ordersRef, orderBy('createdAt', 'desc')); // Tri par date décroissante
-    const snapshot = await getDocs(q);
-    const orders: Order[] = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Order[];
-    return orders;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des commandes :", error);
-    return [];
-  }
-};
 
 export default function OrderHistory() {
-  const { orders: contextOrders, setOrders } = useCart(); 
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadOrders = async () => {
-      setLoading(true);
-      const ordersFromDB = await fetchOrdersFromFirestore();
-      setOrders(ordersFromDB);
-      setLoading(false);
-    };
-    loadOrders();
-  }, []);
+  const { orders: contextOrders, ordersLoading: loading } = useCart();
+  const { user } = useAuth();
+
 
   if (loading) {
     return (
@@ -44,6 +18,15 @@ export default function OrderHistory() {
       </View>
     );
   }
+
+  if (!user) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>Veuillez vous connecter pour voir vos commandes.</Text>
+      </View>
+    );
+  }
+
 
   if (!contextOrders || contextOrders.length === 0) {
     return (
@@ -66,10 +49,10 @@ export default function OrderHistory() {
             <Text style={styles.orderDate}>
               {item.createdAt
                 ? new Date(item.createdAt.seconds * 1000).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })
                 : 'Date inconnue'}
             </Text>
           </View>
@@ -80,7 +63,7 @@ export default function OrderHistory() {
 
         <View style={styles.itemsPreview}>
           {items.slice(0, 3).map((product, index) => (
-            <Image key={index} source={{ uri: product.image }} style={styles.itemThumb} />
+            <Image key={index} source={product.image} style={styles.itemThumb} />
           ))}
 
           {items.length > 3 && (
